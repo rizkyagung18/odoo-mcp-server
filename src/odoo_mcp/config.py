@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 REQUIRED = ("ODOO_URL", "ODOO_DB", "ODOO_USER", "ODOO_PASSWORD")
+TRUTHY = {"1", "true", "yes", "on"}
 
 
 @dataclass(frozen=True)
@@ -19,11 +20,27 @@ class Settings:
     db: str
     user: str
     password: str
+    read_only: bool = False
+
+
+def _load_env(env_file: Path | None = None) -> None:
+    # override=False: variables already set in the environment win over .env values.
+    load_dotenv(env_file or PROJECT_ROOT / ".env", override=False)
+
+
+def read_only_mode() -> bool:
+    """True when ODOO_READ_ONLY is truthy: all write tools are then disabled.
+
+    Doesn't need the other settings, so the server can decide which tools to
+    register at startup even if the Odoo credentials are missing.
+    """
+    _load_env()
+    return os.environ.get("ODOO_READ_ONLY", "false").strip().lower() in TRUTHY
 
 
 def load_settings(env_file: Path | None = None) -> Settings:
-    """Read settings. Variables already set in the environment win over .env values."""
-    load_dotenv(env_file or PROJECT_ROOT / ".env", override=False)
+    """Read all settings, raising ValueError if a required one is missing."""
+    _load_env(env_file)
 
     missing = [name for name in REQUIRED if not os.environ.get(name)]
     if missing:
@@ -37,4 +54,5 @@ def load_settings(env_file: Path | None = None) -> Settings:
         db=os.environ["ODOO_DB"],
         user=os.environ["ODOO_USER"],
         password=os.environ["ODOO_PASSWORD"],
+        read_only=read_only_mode(),
     )

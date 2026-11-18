@@ -28,6 +28,10 @@ class OdooAuthError(OdooError):
     """Login rejected: wrong database, user or password."""
 
 
+class OdooReadOnlyError(OdooError):
+    """A write was attempted while ODOO_READ_ONLY is on."""
+
+
 def _make_transport(url: str, timeout: float) -> xmlrpc.client.Transport:
     """Return the standard XML-RPC transport with a socket timeout added.
 
@@ -51,17 +55,29 @@ def _fault_message(fault: xmlrpc.client.Fault) -> str:
 
 
 class OdooClient:
-    def __init__(self, url: str, db: str, user: str, password: str, timeout: float = 10.0):
+    def __init__(
+        self,
+        url: str,
+        db: str,
+        user: str,
+        password: str,
+        timeout: float = 10.0,
+        read_only: bool = False,
+    ):
         self.url = url.rstrip("/")
         self.db = db
         self.user = user
         self.password = password
         self.timeout = timeout
+        self.read_only = read_only
         self._uid: int | None = None  # cached after the first successful login
 
     @classmethod
     def from_settings(cls, settings: Settings) -> "OdooClient":
-        return cls(settings.url, settings.db, settings.user, settings.password)
+        return cls(
+            settings.url, settings.db, settings.user, settings.password,
+            read_only=settings.read_only,
+        )
 
     # -- plumbing -----------------------------------------------------------
 
@@ -154,4 +170,10 @@ class OdooClient:
 
     def create(self, model: str, values: dict) -> int:
         """Create one record and return its id."""
+        # Second line of defence: even if a write tool were registered by mistake,
+        # the client itself refuses to write in read-only mode.
+        if self.read_only:
+            raise OdooReadOnlyError(
+                f"Refusing to create a {model} record: ODOO_READ_ONLY is enabled."
+            )
         return self.execute_kw(model, "create", [values])
