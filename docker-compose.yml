@@ -1,0 +1,42 @@
+# Local Odoo 18 Community + Postgres 16 for development.
+# Start:  docker compose up -d
+# Stop:   docker compose stop        (data is kept in the named volumes)
+# Wipe:   docker compose down -v     (deletes the database too!)
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    # No ports published: only the Odoo container needs to reach Postgres.
+
+  odoo:
+    # Pin the major version: "latest" is Odoo 20 now.
+    image: odoo:18.0
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8069:8069"
+    environment:
+      # Read by the image's entrypoint and passed to Odoo as --db_host etc.
+      HOST: db
+      USER: odoo
+      PASSWORD: odoo
+    volumes:
+      - odoo-web-data:/var/lib/odoo   # filestore (attachments) + sessions
+    restart: unless-stopped
+
+volumes:
+  odoo-db-data:
+  odoo-web-data:
