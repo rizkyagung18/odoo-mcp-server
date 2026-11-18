@@ -1,0 +1,16 @@
+[project]
+name = "odoo-mcp"
+version = "0.1.0"
+description = "MCP server exposing Odoo CRM, Sales and Invoicing data as LLM tools"
+authors = [
+    { name = "Rizky Agung", email = "agungrizky1805@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]>=2.3,<3",
+    "python-dotenv>=1.2.4",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13.0"]
+build-backend = "uv_build"
