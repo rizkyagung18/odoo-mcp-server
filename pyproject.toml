@@ -5,6 +5,7 @@ description = "MCP server exposing Odoo CRM, Sales and Invoicing data as LLM too
 authors = [
     { name = "Rizky Agung", email = "agungrizky1805@gmail.com" }
 ]
+readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "mcp[cli]>=2.3,<3",
@@ -17,3 +18,14 @@ odoo-mcp = "odoo_mcp.server:main"
 [build-system]
 requires = ["uv_build>=0.12.19,<0.13.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: talks to a real Odoo (auto-skipped when Odoo isn't reachable)",
+]
