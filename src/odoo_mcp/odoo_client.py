@@ -138,6 +138,10 @@ class OdooClient:
             kwargs["order"] = order
         return self.execute_kw(model, "search_read", [domain or []], kwargs)
 
+    def search_count(self, model: str, domain: list | None = None) -> int:
+        """Count records matching a domain (ignores any limit)."""
+        return self.execute_kw(model, "search_count", [domain or []])
+
     def read_group(
         self, model: str, domain: list, fields: list[str], groupby: list[str]
     ) -> list[dict]:
