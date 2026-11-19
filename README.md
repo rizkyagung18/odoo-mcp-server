@@ -7,6 +7,10 @@ An [MCP](https://modelcontextprotocol.io) server that lets an LLM (Claude Deskto
 
 This is a learning/portfolio project. It runs against a local Odoo with **demo data only**, the code is kept small, and comments explain the MCP concepts where they first appear.
 
+![Demo: Claude summarizes the Odoo pipeline, lists unpaid invoices, previews and creates a lead, and the read-only switch hides write tools](docs/demo.gif)
+
+<sub>27-second animated walkthrough made with Remotion from real tool output on the demo database. Also available as [MP4](docs/demo.mp4); source in [demo-video/](demo-video/).</sub>
+
 | Tool | What it does | Writes? |
 |---|---|---|
 | `list_leads(stage?, limit=10)` | CRM leads and opportunities, biggest expected revenue first | no |
