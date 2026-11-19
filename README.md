@@ -1,5 +1,8 @@
 # Odoo MCP Server
 
+[![CI](https://github.com/rizkyagung18/odoo-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/rizkyagung18/odoo-mcp-server/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 An [MCP](https://modelcontextprotocol.io) server that lets an LLM (Claude Desktop, or any MCP host) read and carefully write **Odoo 18** data: CRM leads, customers, sales orders and invoices.
 
 This is a learning/portfolio project. It runs against a local Odoo with **demo data only**, the code is kept small, and comments explain the MCP concepts where they first appear.
@@ -86,7 +89,7 @@ Odoo itself is at <http://localhost:8069> (log in as `admin` / `admin`).
 The Inspector is a small UI that acts as an MCP host, so you can call the tools by hand.
 
 ```bash
-npx @modelcontextprotocol/inspector uv --directory /Users/rizkyagung/Documents/odoo-mcp-server run odoo-mcp
+npx @modelcontextprotocol/inspector uv --directory /path/to/odoo-mcp-server run odoo-mcp
 ```
 
 Open the printed `http://127.0.0.1:6274?MCP_INSPECTOR_API_TOKEN=…` URL and switch the **uv** server on. Then go to **Tools**, pick a tool, and click **Execute Tool**.
@@ -94,7 +97,7 @@ Open the printed `http://127.0.0.1:6274?MCP_INSPECTOR_API_TOKEN=…` URL and swi
 The same thing from the terminal (handy for scripts):
 
 ```bash
-DIR=/Users/rizkyagung/Documents/odoo-mcp-server
+DIR=/path/to/odoo-mcp-server
 npx @modelcontextprotocol/inspector --cli --method tools/list uv --directory $DIR run odoo-mcp
 npx @modelcontextprotocol/inspector --cli --method tools/call --tool-name pipeline_summary uv --directory $DIR run odoo-mcp
 npx @modelcontextprotocol/inspector --cli --method tools/call --tool-name list_leads \
@@ -114,10 +117,10 @@ Inspector 2.16 asks for Node `^22.23.4 || ^24.22.1 || >=26.12.1`. On an older pa
    {
      "mcpServers": {
        "odoo": {
-         "command": "/Users/rizkyagung/.local/bin/uv",
+         "command": "/absolute/path/to/uv",
          "args": [
            "--directory",
-           "/Users/rizkyagung/Documents/odoo-mcp-server",
+           "/absolute/path/to/odoo-mcp-server",
            "run",
            "odoo-mcp"
          ]
@@ -185,3 +188,7 @@ The code targets the **MCP Python SDK v2** (`mcp>=2.3`). In v2, `FastMCP` was re
   - For HTTP deployments, add OAuth (the SDK supports `auth=` / `token_verifier=`), rate limiting and audit logging of every write.
   - Stop passing raw Odoo error text (which can include internal hostnames) back to the model.
 - **Odoo 19+ API.** Odoo 19 introduced the JSON-2 API (`POST /json/2/<model>/<method>` with an API key as a bearer token). XML-RPC/JSON-RPC are deprecated and scheduled for removal in Odoo 22. Because every call goes through `OdooClient.execute_kw`, switching is a change to one class.
+
+## License
+
+[MIT](LICENSE)
